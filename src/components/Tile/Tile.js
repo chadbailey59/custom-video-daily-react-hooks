@@ -9,7 +9,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone }) {
   const audioElement = useRef(null);
 
   useEffect(() => {
-    if (audioTrack?.state === 'playable') {
+    if (audioTrack?.state === 'playable' && !isLocal) {
       if (audioElement?.current) {
         (audioElement.current.srcObject =
           audioTrack && new MediaStream([audioTrack.persistentTrack]));
