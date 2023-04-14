@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import {
   useDaily,
   useScreenShare,
@@ -38,6 +38,12 @@ export default function Tray({ leaveCall }) {
   const mutedVideo = localVideo.isOff;
   const mutedAudio = localAudio.isOff;
 
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const audioContext = useRef(new AudioContext());
+  const audioEl = useRef();
+  const track = useRef();
+  const [outVolume, setOutVolume] = useState(100);
+
   /* When a remote participant sends a message in the chat, we want to display a differently colored
    * chat icon in the Tray as a notification. By listening for the `"app-message"` event we'll know
    * when someone has sent a message. */
@@ -72,6 +78,41 @@ export default function Tray({ leaveCall }) {
     }
   };
 
+  useEffect(() => {
+    if (audioEl.current) {
+      if (!track.current) {
+        track.current = audioContext.current.createMediaElementSource(audioEl.current);
+        // start it up
+        const destNode = audioContext.current.createMediaStreamDestination();
+
+        track.current.connect(destNode);
+        callObject.startCustomTrack({
+          track: destNode.stream.getAudioTracks()[0],
+          mode: 'music',
+          trackName: 'music0',
+        });
+      }
+      if (musicPlaying) {
+        audioEl.current.play();
+      } else {
+        // turn it off
+        audioEl.current.pause();
+        console.log({ track });
+      }
+    } else {
+      // no audio element yet, ignore
+    }
+  }, [musicPlaying]);
+
+  useEffect(() => {
+    callObject.sendAppMessage({ msg: 'change-out-volume', volume: outVolume });
+  }, [outVolume]);
+
+  const handleOutVolumeChange = (e) => {
+    console.log('new out volume: ', e.target.value);
+
+    setOutVolume(e.target.value);
+  };
   return (
     <div className="tray">
       {showMeetingInformation && <MeetingInformation />}
@@ -93,6 +134,19 @@ export default function Tray({ leaveCall }) {
             {mutedAudio ? <MicrophoneOff /> : <MicrophoneOn />}
             {mutedAudio ? 'Unmute mic' : 'Mute mic'}
           </button>
+          <audio ref={audioEl} id="music" src="rygar.webm" />
+
+          <button onClick={() => setMusicPlaying(!musicPlaying)} type="button">
+            {musicPlaying ? 'Stop Music' : 'Start Music'}
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={outVolume}
+            onChange={handleOutVolumeChange}
+            id="myRange"
+          />
         </div>
         <div className="actions">
           <button onClick={toggleScreenShare} type="button">

@@ -1,10 +1,11 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   useParticipantIds,
   useScreenShare,
   useLocalParticipant,
   useDailyEvent,
   DailyAudio,
+  useAppMessage,
 } from '@daily-co/daily-react';
 
 import './Call.css';
@@ -14,6 +15,7 @@ import UserMediaError from '../UserMediaError/UserMediaError';
 export default function Call() {
   /* If a participant runs into a getUserMedia() error, we need to warn them. */
   const [getUserMediaError, setGetUserMediaError] = useState(false);
+  const audioRef = useRef();
 
   /* We can use the useDailyEvent() hook to listen for daily-js events. Here's a full list
    * of all events: https://docs.daily.co/reference/daily-js/events */
@@ -23,6 +25,12 @@ export default function Call() {
       setGetUserMediaError(true);
     }, []),
   );
+
+  useAppMessage({
+    onAppMessage: useCallback((ev) => {
+      console.log('message received: ', ev);
+    }, []),
+  });
 
   /* This is for displaying remote participants: this includes other humans, but also screen shares. */
   const { screens } = useScreenShare();
@@ -48,7 +56,7 @@ export default function Call() {
           {screens.map((screen) => (
             <Tile key={screen.screenId} id={screen.session_id} isScreenShare />
           ))}
-          <DailyAudio />
+          <DailyAudio ref={audioRef} />
         </>
       ) : (
         // When there are no remote participants or screen shares
