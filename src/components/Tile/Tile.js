@@ -1,6 +1,7 @@
 import './Tile.css';
 import { DailyVideo, useMediaTrack } from '@daily-co/daily-react';
 import Username from '../Username/Username';
+import Subtitle from '../Subtitle/Subtitle';
 
 export default function Tile({ id, isScreenShare, isLocal, isAlone }) {
   const videoState = useMediaTrack(id, 'video');
@@ -24,6 +25,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone }) {
     <div className={containerCssClasses}>
       <DailyVideo automirror sessionId={id} type={isScreenShare ? 'screenVideo' : 'video'} />
       <Username id={id} isLocal={isLocal} />
+      <Subtitle id={id} />
     </div>
   );
 }

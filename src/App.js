@@ -1,6 +1,6 @@
 import './App.css';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import DailyIframe from '@daily-co/daily-js';
 import { DailyProvider } from '@daily-co/daily-react';
 
@@ -12,6 +12,7 @@ import Call from './components/Call/Call';
 import Header from './components/Header/Header';
 import Tray from './components/Tray/Tray';
 import HairCheck from './components/HairCheck/HairCheck';
+import { LanguageContext } from './contexts/Language/LanguageContext';
 
 /* We decide what UI to show to users based on the state of the app, which is dependent on the state of the call object. */
 const STATE_IDLE = 'STATE_IDLE';
@@ -27,7 +28,8 @@ export default function App() {
   const [roomUrl, setRoomUrl] = useState(null);
   const [callObject, setCallObject] = useState(null);
   const [apiError, setApiError] = useState(false);
-
+  const [lang, setLang] = useState({ subtitles: 'english', audio: 'english' });
+  const langs = useMemo(() => [lang, setLang], [lang]);
   /**
    * Create a new call room. This function will return the newly created room URL.
    * We'll need this URL when pre-authorizing (https://docs.daily.co/reference/rn-daily-js/instance-methods/pre-auth)
@@ -45,6 +47,10 @@ export default function App() {
         setApiError(true);
       });
   }, []);
+
+  useEffect(() => {
+    console.log('whoa, lang just got updated all the way up in app.js: ', lang);
+  }, [lang]);
 
   /**
    * We've created a room, so let's start the hair check. We won't be joining the call yet.
@@ -208,8 +214,10 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header />
-      {renderApp()}
+      <LanguageContext.Provider value={langs}>
+        <Header />
+        {renderApp()}
+      </LanguageContext.Provider>
     </div>
   );
 }

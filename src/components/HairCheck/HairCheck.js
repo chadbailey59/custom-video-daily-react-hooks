@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useContext, useEffect } from 'react';
 import {
   useLocalParticipant,
   useDevices,
@@ -9,6 +9,7 @@ import {
 import UserMediaError from '../UserMediaError/UserMediaError';
 
 import './HairCheck.css';
+import { LanguageContext } from '../../contexts/Language/LanguageContext';
 
 export default function HairCheck({ joinCall, cancelCall }) {
   const localParticipant = useLocalParticipant();
@@ -16,7 +17,7 @@ export default function HairCheck({ joinCall, cancelCall }) {
   const callObject = useDaily();
 
   const [getUserMediaError, setGetUserMediaError] = useState(false);
-
+  const [lang, setLang] = useContext(LanguageContext);
   useDailyEvent(
     'camera-error',
     useCallback(() => {
@@ -33,6 +34,10 @@ export default function HairCheck({ joinCall, cancelCall }) {
     joinCall();
   };
 
+  useEffect(() => {
+    console.log('in hair check, lang changed to: ', lang);
+  }, [lang]);
+
   const updateMicrophone = (e) => {
     setMicrophone(e.target.value);
   };
@@ -43,6 +48,17 @@ export default function HairCheck({ joinCall, cancelCall }) {
 
   const updateCamera = (e) => {
     setCamera(e.target.value);
+  };
+
+  const updateSubtitleLanguage = (e) => {
+    console.log('setting subtitle language', e.target.value);
+    setLang({ audio: lang.audio, subtitles: e.target.value });
+  };
+
+  const updateAudioLanguage = (e) => {
+    console.log('setting audio language', e.target.value);
+
+    setLang({ audio: e.target.value, subtitles: lang.subtitles });
   };
 
   return getUserMediaError ? (
@@ -98,6 +114,37 @@ export default function HairCheck({ joinCall, cancelCall }) {
               {camera.device.label}
             </option>
           ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="subtitleLanguage">Subtitle language:</label>
+        <select
+          name="subtitleLanguage"
+          id="subtitleLanguageSelect"
+          onChange={updateSubtitleLanguage}
+          value={lang.subtitles}>
+          <option key="english" value="english">
+            English
+          </option>
+          <option key="french" value="french">
+            French
+          </option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="audioLanguage">Audio language:</label>
+        <select
+          name="audioLanguage"
+          id="audioLanguageSelect"
+          onChange={updateAudioLanguage}
+          value={lang.audio}>
+          <option key="english" value="english">
+            English
+          </option>
+          <option key="french" value="french">
+            French
+          </option>
         </select>
       </div>
 
