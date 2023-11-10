@@ -15,7 +15,7 @@ import { LanguageContext } from '../../contexts/Language/LanguageContext';
 export default function Call() {
   /* If a participant runs into a getUserMedia() error, we need to warn them. */
   const [getUserMediaError, setGetUserMediaError] = useState(false);
-  const [lang, setLang] = useContext(LanguageContext);
+  const [lang] = useContext(LanguageContext);
   const audioRef = useRef(null);
   /* We can use the useDailyEvent() hook to listen for daily-js events. Here's a full list
    * of all events: https://docs.daily.co/reference/daily-js/events */
@@ -38,7 +38,7 @@ export default function Call() {
   );
 
   useEffect(() => {
-    //console.log('audioref current: ', audioRef.current);
+    // console.log('audioref current: ', audioRef.current);
     if (audioRef.current) {
       const audioTags = audioRef.current.getAllAudio();
       audioTags.forEach((t) => {
@@ -48,7 +48,7 @@ export default function Call() {
             const langData = lang.remote[t.dataset.sessionId];
 
             // if their spoken language isn't what I want to hear, turn them down
-            if (langData.spoken != lang.local.audio) {
+            if (langData.spoken !== lang.local.audio) {
               t.volume = 0.1;
             } else {
               t.volume = 1;
@@ -56,7 +56,7 @@ export default function Call() {
           } else if (lang.translators[t.dataset.sessionId]) {
             // This is the audio tag for a translatorbot
             const langData = lang.translators[t.dataset.sessionId];
-            if (langData.out == lang.local.audio) {
+            if (langData.out === lang.local.audio) {
               t.volume = 1;
             } else {
               t.volume = 0;
@@ -73,14 +73,13 @@ export default function Call() {
         {/* Your self view */}
         {localParticipant && <Tile id={localParticipant.session_id} isLocal isAlone={isAlone} />}
         {/* Videos of remote participants and screen shares */}
-        <>
-          {remoteParticipantIds.map((id) => (
-            <Tile key={id} id={id} />
-          ))}
-          {screens.map((screen) => (
-            <Tile key={screen.screenId} id={screen.session_id} isScreenShare />
-          ))}
-        </>
+
+        {remoteParticipantIds.map((id) => (
+          <Tile key={id} id={id} />
+        ))}
+        {screens.map((screen) => (
+          <Tile key={screen.screenId} id={screen.session_id} isScreenShare />
+        ))}
       </div>
       <DailyAudio ref={audioRef} />
     </>

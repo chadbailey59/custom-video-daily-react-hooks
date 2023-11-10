@@ -9,7 +9,6 @@ import { roomUrlFromPageUrl, pageUrlFromRoomUrl } from './utils';
 
 import HomeScreen from './components/HomeScreen/HomeScreen';
 import Call from './components/Call/Call';
-import Header from './components/Header/Header';
 import Tray from './components/Tray/Tray';
 import HairCheck from './components/HairCheck/HairCheck';
 import { LanguageContext } from './contexts/Language/LanguageContext';
@@ -80,7 +79,7 @@ export default function App() {
     });
     callObject.on('app-message', (e) => {
       console.log('app message received', e);
-      if (e.fromId == 'transcription') {
+      if (e.fromId === 'transcription') {
         console.log('GOT NATIVE TRANSCRIPTION: ', e.data.text);
       } else if (e.data?.msg === 'request-languages') {
         callObject.sendAppMessage({ msg: 'participant', data: { lang: lang.local } });

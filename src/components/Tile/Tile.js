@@ -29,7 +29,7 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone }) {
 
   return (
     <>
-      {!username.match(/^tb\-/) && (
+      {!username.match(/^tb-/) && (
         <div className={containerCssClasses}>
           <DailyVideo
             automirror

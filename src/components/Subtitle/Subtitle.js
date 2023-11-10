@@ -9,7 +9,7 @@ export default function Subtitle({ id }) {
   const textTimeout = useRef();
   const sendAppMessage = useAppMessage({
     onAppMessage: (ev) => {
-      if (lang.local?.subtitles == ev.data?.translation_language && ev.data?.session_id === id) {
+      if (lang.local?.subtitles === ev.data?.translation_language && ev.data?.session_id === id) {
         setText(ev.data.translation);
         console.log('textTimeout current: ', textTimeout.current);
         if (textTimeout.current) {

@@ -19,5 +19,9 @@ module.exports = {
     'react/no-array-index-key': 'off',
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
+    'no-param-reassign': 'off',
+    'no-unused-vars': 'off',
+    'import/prefer-default-export': 'off',
+    'react/jsx-no-useless-fragment': 'off',
   },
 };
