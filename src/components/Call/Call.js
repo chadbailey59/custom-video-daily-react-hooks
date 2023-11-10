@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect, useContext } from 'react';
 import {
   useParticipantIds,
   useScreenShare,
@@ -10,10 +10,12 @@ import {
 import './Call.css';
 import Tile from '../Tile/Tile';
 import UserMediaError from '../UserMediaError/UserMediaError';
+import { LanguageContext } from '../../contexts/Language/LanguageContext';
 
 export default function Call() {
   /* If a participant runs into a getUserMedia() error, we need to warn them. */
   const [getUserMediaError, setGetUserMediaError] = useState(false);
+  const [lang, setLang] = useContext(LanguageContext);
   const audioRef = useRef(null);
   /* We can use the useDailyEvent() hook to listen for daily-js events. Here's a full list
    * of all events: https://docs.daily.co/reference/daily-js/events */
@@ -36,19 +38,41 @@ export default function Call() {
   );
 
   useEffect(() => {
-    console.log('audioref current: ', audioRef.current);
+    //console.log('audioref current: ', audioRef.current);
     if (audioRef.current) {
       const audioTags = audioRef.current.getAllAudio();
-      console.log({ audioTags });
+      audioTags.forEach((t) => {
+        if (t.dataset.sessionId) {
+          if (lang.remote[t.dataset.sessionId]) {
+            // this is an audio tag for a remote participant
+            const langData = lang.remote[t.dataset.sessionId];
+
+            // if their spoken language isn't what I want to hear, turn them down
+            if (langData.spoken != lang.local.audio) {
+              t.volume = 0.1;
+            } else {
+              t.volume = 1;
+            }
+          } else if (lang.translators[t.dataset.sessionId]) {
+            // This is the audio tag for a translatorbot
+            const langData = lang.translators[t.dataset.sessionId];
+            if (langData.out == lang.local.audio) {
+              t.volume = 1;
+            } else {
+              t.volume = 0;
+            }
+          }
+        }
+      });
     }
   }, [remoteParticipantIds]);
 
   const renderCallScreen = () => (
-    <div className={screens.length > 0 ? 'is-screenshare' : 'call'}>
-      {/* Your self view */}
-      {localParticipant && <Tile id={localParticipant.session_id} isLocal isAlone={isAlone} />}
-      {/* Videos of remote participants and screen shares */}
-      {remoteParticipantIds?.length > 0 || screens?.length > 0 ? (
+    <>
+      <div className="call">
+        {/* Your self view */}
+        {localParticipant && <Tile id={localParticipant.session_id} isLocal isAlone={isAlone} />}
+        {/* Videos of remote participants and screen shares */}
         <>
           {remoteParticipantIds.map((id) => (
             <Tile key={id} id={id} />
@@ -56,17 +80,10 @@ export default function Call() {
           {screens.map((screen) => (
             <Tile key={screen.screenId} id={screen.session_id} isScreenShare />
           ))}
-          <DailyAudio ref={audioRef} />
         </>
-      ) : (
-        // When there are no remote participants or screen shares
-        <div className="info-box">
-          <h1>Waiting for others</h1>
-          <p>Invite someone by sharing this link:</p>
-          <span className="room-url">{window.location.href}</span>
-        </div>
-      )}
-    </div>
+      </div>
+      <DailyAudio ref={audioRef} />
+    </>
   );
 
   return getUserMediaError ? <UserMediaError /> : renderCallScreen();

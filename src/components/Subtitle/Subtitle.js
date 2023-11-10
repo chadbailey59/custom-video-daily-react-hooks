@@ -9,17 +9,7 @@ export default function Subtitle({ id }) {
 
   const sendAppMessage = useAppMessage({
     onAppMessage: (ev) => {
-      console.log('lang: ', lang);
-
-      if (
-        lang.subtitles === 'english' &&
-        ev.fromId === 'transcription' &&
-        ev.data.session_id === id
-      ) {
-        console.log('got transcription message: ', ev.data.text);
-        setText(ev.data.text);
-      } else if (lang.subtitles === 'french' && ev.data?.session_id === id) {
-        console.log('got FRENCH transcription message: ', ev.data.translation);
+      if (lang.local?.subtitles == ev.data?.translation_language && ev.data?.session_id === id) {
         setText(ev.data.translation);
       }
     },

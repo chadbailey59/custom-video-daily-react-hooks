@@ -28,7 +28,11 @@ export default function App() {
   const [roomUrl, setRoomUrl] = useState(null);
   const [callObject, setCallObject] = useState(null);
   const [apiError, setApiError] = useState(false);
-  const [lang, setLang] = useState({ subtitles: 'english', audio: 'english' });
+  const [lang, setLang] = useState({
+    local: { subtitles: 'english', audio: 'english', spoken: 'english' },
+    remote: {},
+    translators: {},
+  });
   const langs = useMemo(() => [lang, setLang], [lang]);
   /**
    * Create a new call room. This function will return the newly created room URL.
@@ -68,8 +72,33 @@ export default function App() {
    * Once we pass the hair check, we can actually join the call.
    */
   const joinCall = useCallback(() => {
+    callObject.once('joined-meeting', () => {
+      // Announce my language settings for everyone on the call,
+      // since daily-python doesn't support session data yet
+      callObject.sendAppMessage({ msg: 'participant', data: { lang: lang.local } });
+      callObject.sendAppMessage({ msg: 'request-languages' });
+    });
+    callObject.on('app-message', (e) => {
+      console.log('app message received', e);
+      if (e.fromId == 'transcription') {
+        console.log('GOT NATIVE TRANSCRIPTION: ', e.data.text);
+      } else if (e.data?.msg === 'request-languages') {
+        callObject.sendAppMessage({ msg: 'participant', data: { lang: lang.local } });
+      } else if (e.data?.msg === 'participant') {
+        console.log('got participant lang info', e);
+        const newRemote = lang.remote;
+        newRemote[e.fromId] = e.data?.data?.lang;
+        setLang({ local: lang.local, translators: lang.translators, remote: newRemote });
+      } else if (e.data?.msg === 'translatorbot') {
+        const newTranslators = lang.translators;
+        newTranslators[e.fromId] = e.data?.data;
+        setLang({ local: lang.local, remote: lang.remote, translators: newTranslators });
+      }
+    });
     callObject.join({ url: roomUrl });
-  }, [callObject, roomUrl]);
+    window.callObject = callObject;
+    window.call = callObject;
+  }, [callObject, roomUrl, lang]);
 
   /**
    * Start leaving the current call.
@@ -214,10 +243,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <LanguageContext.Provider value={langs}>
-        <Header />
-        {renderApp()}
-      </LanguageContext.Provider>
+      <LanguageContext.Provider value={langs}>{renderApp()}</LanguageContext.Provider>
     </div>
   );
 }

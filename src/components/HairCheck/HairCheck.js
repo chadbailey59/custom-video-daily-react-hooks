@@ -52,13 +52,29 @@ export default function HairCheck({ joinCall, cancelCall }) {
 
   const updateSubtitleLanguage = (e) => {
     console.log('setting subtitle language', e.target.value);
-    setLang({ audio: lang.audio, subtitles: e.target.value });
+    setLang({
+      local: { audio: lang.local.audio, subtitles: e.target.value, spoken: lang.local.spoken },
+      remote: lang.remote,
+      translators: lang.translators,
+    });
   };
 
   const updateAudioLanguage = (e) => {
     console.log('setting audio language', e.target.value);
 
-    setLang({ audio: e.target.value, subtitles: lang.subtitles });
+    setLang({
+      local: { audio: e.target.value, subtitles: lang.local.subtitles, spoken: lang.local.spoken },
+      remote: lang.remote,
+      translators: lang.translators,
+    });
+  };
+
+  const updateSpokenLanguage = (e) => {
+    setLang({
+      local: { audio: lang.local.audio, subtitles: lang.local.subtitles, spoken: e.target.value },
+      remote: lang.remote,
+      translators: lang.translators,
+    });
   };
 
   return getUserMediaError ? (
@@ -116,7 +132,21 @@ export default function HairCheck({ joinCall, cancelCall }) {
           ))}
         </select>
       </div>
-
+      <div>
+        <label htmlFor="spokenLanguage">Spoken language:</label>
+        <select
+          name="spokenLanguage"
+          id="spokenLanguageSelect"
+          onChange={updateSpokenLanguage}
+          value={lang.spoken}>
+          <option key="english" value="english">
+            English
+          </option>
+          <option key="spanish" value="spanish">
+            Spanish
+          </option>
+        </select>
+      </div>
       <div>
         <label htmlFor="subtitleLanguage">Subtitle language:</label>
         <select
@@ -127,8 +157,8 @@ export default function HairCheck({ joinCall, cancelCall }) {
           <option key="english" value="english">
             English
           </option>
-          <option key="french" value="french">
-            French
+          <option key="spanish" value="spanish">
+            Spanish
           </option>
         </select>
       </div>
@@ -142,8 +172,8 @@ export default function HairCheck({ joinCall, cancelCall }) {
           <option key="english" value="english">
             English
           </option>
-          <option key="french" value="french">
-            French
+          <option key="spanish" value="spanish">
+            Spanish
           </option>
         </select>
       </div>
