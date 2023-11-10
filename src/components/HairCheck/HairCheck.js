@@ -53,7 +53,12 @@ export default function HairCheck({ joinCall, cancelCall }) {
   const updateSubtitleLanguage = (e) => {
     console.log('setting subtitle language', e.target.value);
     setLang({
-      local: { audio: lang.local.audio, subtitles: e.target.value, spoken: lang.local.spoken },
+      local: {
+        audio: lang.local.audio,
+        subtitles: e.target.value,
+        spoken: lang.local.spoken,
+        voice: lang.local.voice,
+      },
       remote: lang.remote,
       translators: lang.translators,
     });
@@ -63,7 +68,12 @@ export default function HairCheck({ joinCall, cancelCall }) {
     console.log('setting audio language', e.target.value);
 
     setLang({
-      local: { audio: e.target.value, subtitles: lang.local.subtitles, spoken: lang.local.spoken },
+      local: {
+        audio: e.target.value,
+        subtitles: lang.local.subtitles,
+        spoken: lang.local.spoken,
+        voice: lang.local.voice,
+      },
       remote: lang.remote,
       translators: lang.translators,
     });
@@ -71,7 +81,25 @@ export default function HairCheck({ joinCall, cancelCall }) {
 
   const updateSpokenLanguage = (e) => {
     setLang({
-      local: { audio: lang.local.audio, subtitles: lang.local.subtitles, spoken: e.target.value },
+      local: {
+        audio: lang.local.audio,
+        subtitles: lang.local.subtitles,
+        spoken: e.target.value,
+        voice: lang.local.voice,
+      },
+      remote: lang.remote,
+      translators: lang.translators,
+    });
+  };
+
+  const updateVoice = (e) => {
+    setLang({
+      local: {
+        audio: lang.local.audio,
+        subtitles: lang.local.subtitles,
+        spoken: lang.local.spoken,
+        voice: e.target.value,
+      },
       remote: lang.remote,
       translators: lang.translators,
     });
@@ -174,6 +202,17 @@ export default function HairCheck({ joinCall, cancelCall }) {
           </option>
           <option key="spanish" value="spanish">
             Spanish
+          </option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="voice">Preferred voice:</label>
+        <select name="voice" id="voiceSelect" onChange={updateVoice} value={lang.voice}>
+          <option key="male" value="male">
+            Male
+          </option>
+          <option key="female" value="female">
+            Female
           </option>
         </select>
       </div>

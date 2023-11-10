@@ -1,10 +1,16 @@
 import './Tile.css';
-import { DailyVideo, useMediaTrack, DailyAudioTrack } from '@daily-co/daily-react';
+import {
+  DailyVideo,
+  useMediaTrack,
+  DailyAudioTrack,
+  useParticipantProperty,
+} from '@daily-co/daily-react';
 import Username from '../Username/Username';
 import Subtitle from '../Subtitle/Subtitle';
 
 export default function Tile({ id, isScreenShare, isLocal, isAlone }) {
   const videoState = useMediaTrack(id, 'video');
+  const username = useParticipantProperty(id, 'user_name');
 
   let containerCssClasses = isScreenShare ? 'tile-screenshare' : 'tile-video';
 
@@ -23,17 +29,18 @@ export default function Tile({ id, isScreenShare, isLocal, isAlone }) {
 
   return (
     <>
-      <div className={containerCssClasses}>
-        <DailyVideo
-          automirror
-          sessionId={id}
-          type={isScreenShare ? 'screenVideo' : 'video'}
-          fit="cover"
-        />
-        <Username id={id} isLocal={isLocal} />
-        <Subtitle id={id} />
-      </div>
-      {/* !isLocal && <DailyAudioTrack sessionId={id} type="audio" /> */}
+      {!username.match(/^tb\-/) && (
+        <div className={containerCssClasses}>
+          <DailyVideo
+            automirror
+            sessionId={id}
+            type={isScreenShare ? 'screenVideo' : 'video'}
+            fit="cover"
+          />
+          <Username id={id} isLocal={isLocal} />
+          <Subtitle id={id} />
+        </div>
+      )}
     </>
   );
 }

@@ -29,7 +29,7 @@ export default function App() {
   const [callObject, setCallObject] = useState(null);
   const [apiError, setApiError] = useState(false);
   const [lang, setLang] = useState({
-    local: { subtitles: 'english', audio: 'english', spoken: 'english' },
+    local: { subtitles: 'english', audio: 'english', spoken: 'english', voice: 'male' },
     remote: {},
     translators: {},
   });
