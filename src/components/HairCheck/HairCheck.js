@@ -173,6 +173,9 @@ export default function HairCheck({ joinCall, cancelCall }) {
           <option key="spanish" value="spanish">
             Spanish
           </option>
+          <option key="japanese" value="japanese">
+            Japanese
+          </option>
         </select>
       </div>
       <div>
@@ -188,6 +191,9 @@ export default function HairCheck({ joinCall, cancelCall }) {
           <option key="spanish" value="spanish">
             Spanish
           </option>
+          <option key="japanese" value="japanese">
+            Japanese
+          </option>
         </select>
       </div>
       <div>
@@ -202,6 +208,9 @@ export default function HairCheck({ joinCall, cancelCall }) {
           </option>
           <option key="spanish" value="spanish">
             Spanish
+          </option>
+          <option key="japanese" value="japanese">
+            Japanese
           </option>
         </select>
       </div>
