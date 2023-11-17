@@ -11,7 +11,6 @@ export default function Subtitle({ id }) {
     onAppMessage: (ev) => {
       if (lang.local?.subtitles === ev.data?.translation_language && ev.data?.session_id === id) {
         setText(ev.data.translation);
-        console.log('textTimeout current: ', textTimeout.current);
         if (textTimeout.current) {
           clearTimeout(textTimeout.current);
         }
